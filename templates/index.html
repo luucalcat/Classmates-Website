@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classmates Matchmaking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: calc(100% - 40px);
+            text-align: center;
+            background-color: #ffffff;
+            border: 10px solid #ff4081; /* Border color */
+            box-sizing: border-box; /* Ensure padding and border included in width */
+        }
+
+        h1 {
+            color: #ff4081;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            margin-top: 5px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        button {
+            background-color: #ff4081;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #e91e63;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+    </style>
+    <script>
+        async function findMatch(event) {
+            event.preventDefault();
+            const person1 = document.getElementById('person1').value;
+            const person2 = document.getElementById('person2').value;
+
+            const response = await fetch('/match', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ person1, person2 }),
+            });
+
+            const data = await response.json();
+
+            const messageContainer = document.getElementById('message');
+            if (response.ok) {
+                messageContainer.style.color = 'green';
+                messageContainer.innerHTML = `<span class="heart">❤️</span> ${data.message}`;
+            } else {
+                messageContainer.style.color = 'red';
+                messageContainer.textContent = data.error;
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Classmates Matchmaking</h1>
+        
+        <form onsubmit="findMatch(event)">
+            <label for="person1">Your Name:</label>
+            <select name="person1" id="person1" required>
+                <option value="" disabled selected>Select your name</option>
+                {% for classmate in classmates %}
+                <option value="{{ classmate }}">{{ classmate }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="person2">Your Crush's Name:</label>
+            <select name="person2" id="person2" required>
+                <option value="" disabled selected>Select your crush's name</option>
+                {% for classmate in classmates %}
+                <option value="{{ classmate }}">{{ classmate }}</option>
+                {% endfor %}
+            </select>
+            
+            <button type="submit">Find Match</button>
+        </form>
+
+        <div id="message"></div>
+    </div>
+</body>
+</html>
